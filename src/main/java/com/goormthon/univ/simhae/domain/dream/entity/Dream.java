@@ -5,6 +5,7 @@ import com.goormthon.univ.simhae.domain.dream.entity.value.Category;
 import com.goormthon.univ.simhae.domain.user.entity.User;
 import com.goormthon.univ.simhae.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,10 +24,12 @@ public class Dream extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
+    @NotNull
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
     private User user;
 
     private String title;
@@ -36,7 +39,8 @@ public class Dream extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String summary;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
+    @NotNull
     private String content;
 
     @Enumerated(EnumType.STRING)
