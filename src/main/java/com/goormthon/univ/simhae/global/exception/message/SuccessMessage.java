@@ -16,6 +16,7 @@ public enum SuccessMessage {
     201 Created
      */
     CREATE_SUCCESS(HttpStatus.CREATED.value(), "꿈 해몽 생성이 완료되었습니다"),
+    UNCONSCIOUS_SUCCESS(HttpStatus.CREATED.value(), "무의식 분석이 완료되었습니다"),
 
     /*
     204 No Content
