@@ -36,12 +36,16 @@ public class GlobalExceptionHandler {
                 case "NotNull", "NotBlank" -> errorMessage = ErrorMessage.REQUIRED_FIELD_MISSING;
                 case "Size" -> {
                     int min = (int) fieldError.getArguments()[1];
-                    int max = (int) fieldError.getArguments()[2];
+                    int max = (int) fieldError.getArguments()[2]; // max는 필요 없음
 
                     if (length < min) {
-                        errorMessage = ErrorMessage.INPUT_VALUE_TOO_SHORT; // 최소 길이 미만
+                        if ("recentDreamAnalyses".equals(fieldError.getField())) {
+                            errorMessage = ErrorMessage.UNCONSCIOUS_MIN_DREAMS;
+                        } else {
+                            errorMessage = ErrorMessage.INPUT_VALUE_TOO_SHORT;
+                        }
                     } else if (length > max) {
-                        errorMessage = ErrorMessage.INPUT_VALUE_TOO_LONG;  // 최대 길이 초과
+                        errorMessage = ErrorMessage.INPUT_VALUE_TOO_LONG;
                     }
                 }
             }

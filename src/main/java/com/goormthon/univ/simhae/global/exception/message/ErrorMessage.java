@@ -14,6 +14,7 @@ public enum ErrorMessage {
 
     // 404 Not Found
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 데이터를 찾을 수 없습니다"),
+    UNCONSCIOUS_MIN_DREAMS(HttpStatus.BAD_REQUEST.value(), "무의식 분석을 위해 최소 7개의 꿈 해석이 필요합니다"),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다"),
