@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface DreamRepository extends JpaRepository<Dream, Long> {
 
-    List<Dream> findTop7ByUserIdOrderByCreatedAtDesc(Long userId);
+    List<Dream> findTop7ByUserIdOrderByCreatedDateDesc(Long userId);
 
 }
