@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   springboot:
-    image: kimjinbeom/simhae-springboot:latest
+    image: kimjinbum/simhae-springboot:latest
     ports:
       - "8080:8080"
     environment:
