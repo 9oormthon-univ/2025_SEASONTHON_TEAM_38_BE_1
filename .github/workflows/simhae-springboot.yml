@@ -2,15 +2,17 @@ name: SIMHAE CI/CD
 
 on:
   push:
-    branches: [ develop ]
+    branches:
+      - develop
 
 jobs:
   build-deploy:
+    if: github.repository == 'bum0w0/2025_SEASONTHON_TEAM_38_BE_1' || github.repository == 'YUSEONU/2025_SEASONTHON_TEAM_38_BE_1'
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
+      # ... 나머지 steps
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
