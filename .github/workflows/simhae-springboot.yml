@@ -3,7 +3,7 @@ name: SIMHAE CI/CD
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   build-deploy:
@@ -30,10 +30,11 @@ jobs:
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user/2025_SEASONTHON_TEAM_38_BE_1         # EC2 docker-compose.yml 위치
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" —password-stdin
             export RDS_ENDPOINT=${{ secrets.RDS_ENDPOINT }}
             export DB_USERNAME=${{ secrets.DB_USERNAME }}
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
