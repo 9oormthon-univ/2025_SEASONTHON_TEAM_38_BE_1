@@ -6,6 +6,4 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DB_URL: jdbc:postgresql://$RDS_ENDPOINT:5432/postgres
-      DB_USERNAME: $DB_USERNAME
-      DB_PASSWORD: $DB_PASSWORD
+      SPRING_PROFILES_ACTIVE: prod
