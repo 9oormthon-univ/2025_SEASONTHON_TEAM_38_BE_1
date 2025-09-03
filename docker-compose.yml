@@ -1,12 +1,12 @@
 version: '3.9'
-
 services:
   springboot:
     image: kimjinbum/simhae-springboot:latest
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: prod   # prod.yml 사용
-      RDS_ENDPOINT: ${RDS_ENDPOINT} # Actions에서 export 하는 값
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://${RDS_ENDPOINT}:3306/simhae?serverTimezone=Asia/Seoul&useSSL=false
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      DEPLOY_FASTAPI_URL: "fastapi:8000"
