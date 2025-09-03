@@ -6,4 +6,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: prod   # prod.yml 사용
+      RDS_ENDPOINT: ${RDS_ENDPOINT} # Actions에서 export 하는 값
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
