@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-slim
 WORKDIR /app
 
 ARG JAR_FILE=build/libs/*.jar
