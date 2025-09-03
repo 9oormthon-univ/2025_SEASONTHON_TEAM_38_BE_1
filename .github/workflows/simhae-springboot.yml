@@ -46,7 +46,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user/2025_SEASONTHON_TEAM_38_BE_1
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}"--password-stdin
             export RDS_ENDPOINT='${{ secrets.RDS_ENDPOINT }}'
             export DB_USERNAME='${{ secrets.DB_USERNAME }}'
             export DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
