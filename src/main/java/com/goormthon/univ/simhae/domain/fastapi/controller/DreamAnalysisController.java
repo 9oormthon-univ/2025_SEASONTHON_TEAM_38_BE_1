@@ -22,9 +22,10 @@ public class DreamAnalysisController {
     // AI 꿈 해몽 - 재진술, 무의식, 제안
     @PostMapping("/overall")
     public ResponseEntity<SuccessResponse<Map<String, Object>>> analyzeOverall(
-            @RequestBody @Valid DreamAnalyzeRequest request) {
+            @RequestBody @Valid DreamAnalyzeRequest request,
+            @RequestHeader("X-Anonymous-Id") String externalId) {
 
-        Map<String, Object> result = dreamAnalysisService.analyzeOverall(request);
+        Map<String, Object> result = dreamAnalysisService.analyzeOverall(request, externalId);
         return ResponseEntity.status(201)
                 .body(SuccessResponse.of(SuccessMessage.CREATE_SUCCESS, result));
     }

@@ -1,6 +1,6 @@
 package com.goormthon.univ.simhae.domain.fastapi.controller;
 
-import com.goormthon.univ.simhae.domain.dream.entity.Dream;
+import com.goormthon.univ.simhae.domain.fastapi.dto.overall.DreamAnalyzeRequest;
 import com.goormthon.univ.simhae.domain.fastapi.dto.overall.RephraseResponse;
 import com.goormthon.univ.simhae.domain.fastapi.dto.overall.UnconsciousResponse;
 import com.goormthon.univ.simhae.domain.fastapi.dto.overall.RecommendationResponse;
@@ -56,8 +56,10 @@ class DreamAnalysisControllerTest {
         dummy.put("unconscious", new UnconsciousResponse("기쁨", "자유와 성취감을 느끼고 있음"));
         dummy.put("recommendation", new RecommendationResponse("최근 스트레스 요인을 줄이고, 긍정적인 활동 계획을 세워보세요."));
 
-        Mockito.when(dreamAnalysisService.analyzeOverall(any()))
-                .thenReturn(dummy);
+        Mockito.when(dreamAnalysisService.analyzeOverall(
+                Mockito.any(DreamAnalyzeRequest.class),
+                Mockito.any(String.class)
+        )).thenReturn(dummy);
 
         mockMvc.perform(post("/ai/dreams/overall")
                         .contentType(MediaType.APPLICATION_JSON)

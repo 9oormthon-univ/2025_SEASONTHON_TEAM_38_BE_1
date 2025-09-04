@@ -52,5 +52,6 @@ jobs:
             export RDS_ENDPOINT='${{ secrets.RDS_ENDPOINT }}'
             export DB_USERNAME='${{ secrets.DB_USERNAME }}'
             export DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+            docker-compose up -d
             docker-compose pull
             docker-compose up -d

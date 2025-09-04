@@ -1,4 +1,5 @@
 version: '3.9'
+
 services:
   springboot:
     image: kimjinbum/simhae-springboot:latest
@@ -10,3 +11,9 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       DEPLOY_FASTAPI_URL: "fastapi:8000"
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    external: true
