@@ -10,3 +10,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       DEPLOY_FASTAPI_URL: "fastapi:8000"
+  fastapi:
+    image: kimjinbum/simhae-fastapi:latest
+    ports:
+      - "8000:8000"

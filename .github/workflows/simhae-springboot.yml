@@ -49,8 +49,9 @@ jobs:
           script: |
             cd /home/ec2-user/2025_SEASONTHON_TEAM_38_BE_1
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            export RDS_ENDPOINT='${{ secrets.RDS_ENDPOINT }}'
-            export DB_USERNAME='${{ secrets.DB_USERNAME }}'
-            export DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+            export RDS_ENDPOINT="${{ secrets.RDS_ENDPOINT }}"
+            export DB_USERNAME="${{ secrets.DB_USERNAME }}"
+            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            docker-compose up -d
             docker-compose pull
             docker-compose up -d
