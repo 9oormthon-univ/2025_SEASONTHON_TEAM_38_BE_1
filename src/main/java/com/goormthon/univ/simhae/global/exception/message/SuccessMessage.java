@@ -11,6 +11,8 @@ public enum SuccessMessage {
     200 OK
      */
     LOAD_SUCCESS(HttpStatus.OK.value(),"꿈 조회가 완료되었습니다"),
+    REGISTER_SUCCESS(HttpStatus.OK.value(),"아이디가 등록되었습니다"),
+
 
     /*
     201 Created

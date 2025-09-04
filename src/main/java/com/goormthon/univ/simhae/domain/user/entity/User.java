@@ -10,7 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_user_external_id", columnNames = "external_id")
+})
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +25,6 @@ public class User extends BaseEntity {
     private Long id;
 
     @Column(name = "external_id", length = 64, nullable = false)
-    private String externalId;
+    private String externalId; // X-Anonymous-Id 저장
 
 }
