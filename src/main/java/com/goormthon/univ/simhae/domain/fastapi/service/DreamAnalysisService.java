@@ -12,6 +12,7 @@ import com.goormthon.univ.simhae.domain.user.entity.User;
 import com.goormthon.univ.simhae.domain.user.repository.UserRepository;
 import com.goormthon.univ.simhae.global.exception.message.ErrorMessage;
 import com.goormthon.univ.simhae.global.exception.model.BadRequestException;
+import com.goormthon.univ.simhae.global.exception.model.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -60,16 +61,16 @@ public class DreamAnalysisService {
     public Map<String, Object> analyzeOverall(DreamAnalyzeRequest request, String externalId) {
         // externalId로 User 조회
         User user = userRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND));
 
         // FastAPI 호출
         String url = "http://" + FAST_API_URL + "/ai/dreams/overall";
         Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
 
-        Map<String, Object> data = (Map<String, Object>) response.get("data");
-        Map<String, Object> restate = (Map<String, Object>) data.get("restate");
-        Map<String, Object> unconscious = (Map<String, Object>) data.get("unconscious");
-        Map<String, Object> suggestionMap = (Map<String, Object>) data.get("suggestion");
+        // FastAPI 응답에서 바로 Map 가져오기
+        Map<String, Object> restate = (Map<String, Object>) response.get("restate");
+        Map<String, Object> unconscious = (Map<String, Object>) response.get("unconscious");
+        Map<String, Object> suggestionMap = (Map<String, Object>) response.get("suggestion");
 
         // Dream 엔티티 생성 및 저장
         Dream dream = Dream.builder()
@@ -78,8 +79,8 @@ public class DreamAnalysisService {
                 .emoji((String) restate.get("emoji"))
                 .content((String) restate.get("content"))
                 .summary((String) restate.getOrDefault("summary", restate.get("content")))
-                .interpretation((String) unconscious.getOrDefault("analysis", ""))
-                .suggestion((String) suggestionMap.getOrDefault("suggestion", ""))
+                .interpretation((String) unconscious.get("analysis"))
+                .suggestion((String) suggestionMap.get("suggestion"))
                 .dreamDate(LocalDate.now())
                 .category(null)
                 .build();
