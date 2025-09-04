@@ -13,6 +13,7 @@ public enum ErrorMessage {
     INPUT_VALUE_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "입력값이 최대 길이를 초과했습니다"),
 
     // 404 Not Found
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 유저를 찾을 수 없습니다"),
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 데이터를 찾을 수 없습니다"),
     UNCONSCIOUS_MIN_DREAMS(HttpStatus.BAD_REQUEST.value(), "무의식 분석을 위해 최소 7개의 꿈 해석이 필요합니다"),
 
