@@ -28,7 +28,7 @@ public class DreamAnalysisService {
     private final DreamRepository dreamRepository;
     private final RestTemplate restTemplate;
 
-    @Value("${deploy.fastapi_url}")
+    @Value("${deploy.fastapi.url}")
     private String FAST_API_URL;
 
     public DreamAnalysisService(DreamRepository dreamRepository) {
