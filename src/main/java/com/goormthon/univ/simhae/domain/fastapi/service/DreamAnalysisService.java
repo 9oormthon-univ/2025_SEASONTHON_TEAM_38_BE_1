@@ -8,6 +8,8 @@ import com.goormthon.univ.simhae.domain.dream.repository.DreamRepository;
 import com.goormthon.univ.simhae.domain.fastapi.dto.overall.DreamAnalyzeRequest;
 import com.goormthon.univ.simhae.domain.fastapi.dto.unconscious.UnconsciousAnalysisResponse;
 import com.goormthon.univ.simhae.domain.fastapi.dto.unconscious.UnconsciousAnalyzeRequest;
+import com.goormthon.univ.simhae.domain.user.entity.User;
+import com.goormthon.univ.simhae.domain.user.repository.UserRepository;
 import com.goormthon.univ.simhae.global.exception.message.ErrorMessage;
 import com.goormthon.univ.simhae.global.exception.model.BadRequestException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,12 +30,14 @@ public class DreamAnalysisService {
 
     private final DreamRepository dreamRepository;
     private final RestTemplate restTemplate;
+    private final UserRepository userRepository;
 
     @Value("${deploy.fastapi.url}")
     private String FAST_API_URL;
 
-    public DreamAnalysisService(DreamRepository dreamRepository) {
+    public DreamAnalysisService(DreamRepository dreamRepository, UserRepository userRepository) {
         this.dreamRepository = dreamRepository;
+        this.userRepository = userRepository;
 
         // ObjectMapper 커스터마이징
         ObjectMapper mapper = new ObjectMapper();
@@ -49,12 +54,38 @@ public class DreamAnalysisService {
     }
 
     /**
-     * 전체 분석 호출
+     * 전체 분석 호출 및 DB 저장
      */
-    public Map<String, Object> analyzeOverall(DreamAnalyzeRequest request) {
+    @Transactional
+    public Map<String, Object> analyzeOverall(DreamAnalyzeRequest request, String externalId) {
+        // externalId로 User 조회
+        User user = userRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // FastAPI 호출
         String url = "http://" + FAST_API_URL + "/ai/dreams/overall";
-        // FastAPI POST 호출
-        return restTemplate.postForObject(url, request, Map.class);
+        Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
+
+        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        Map<String, Object> restate = (Map<String, Object>) data.get("restate");
+        Map<String, Object> unconscious = (Map<String, Object>) data.get("unconscious");
+        Map<String, Object> suggestionMap = (Map<String, Object>) data.get("suggestion");
+
+        // Dream 엔티티 생성 및 저장
+        Dream dream = Dream.builder()
+                .user(user)
+                .title((String) restate.get("title"))
+                .emoji((String) restate.get("emoji"))
+                .content((String) restate.get("content"))
+                .summary((String) restate.getOrDefault("summary", restate.get("content")))
+                .interpretation((String) unconscious.getOrDefault("analysis", ""))
+                .suggestion((String) suggestionMap.getOrDefault("suggestion", ""))
+                .dreamDate(LocalDate.now())
+                .category(null)
+                .build();
+
+        dreamRepository.save(dream);
+        return response;
     }
 
     /**
