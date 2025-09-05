@@ -22,7 +22,6 @@ public interface DreamRepository extends JpaRepository<Dream, Long> {
           AND (
               :keyword IS NULL OR :keyword = '' OR
               LOWER(d.title)   LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-              LOWER(d.summary) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
               LOWER(d.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
           )
         ORDER BY d.dreamDate DESC, d.id DESC
