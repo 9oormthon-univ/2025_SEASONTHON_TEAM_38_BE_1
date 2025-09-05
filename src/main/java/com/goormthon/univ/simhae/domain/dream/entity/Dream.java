@@ -35,9 +35,6 @@ public class Dream extends BaseEntity {
 
     private String emoji;
 
-    @Column(columnDefinition = "TEXT")
-    private String summary;
-
     @Column(columnDefinition = "TEXT", nullable = false)
     @NotNull
     private String content;
