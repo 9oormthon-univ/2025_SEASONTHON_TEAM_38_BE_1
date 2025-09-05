@@ -116,14 +116,20 @@ public class DreamAnalysisService {
     /**
      * 무의식 분석 호출 - 최근 7개 꿈
      */
-    public UnconsciousAnalysisResponse analyzeUnconscious(Long userId) {
-        List<Dream> recentDreams = dreamRepository.findTop7ByUserIdOrderByCreatedDateDesc(userId);
+    public UnconsciousAnalysisResponse analyzeUnconscious(String externalId) {
+        // externalId로 사용자 조회
+        User user = userRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND));
+
+        // 최근 7개 꿈 조회 (userId 사용)
+        List<Dream> recentDreams = dreamRepository.findTop7ByUserIdOrderByCreatedDateDesc(user.getId());
 
         // 최소 7개 검사
         if (recentDreams.size() < 7) {
             throw new BadRequestException(ErrorMessage.UNCONSCIOUS_MIN_DREAMS);
         }
-        //
+
+        // FastAPI 요청용 DTO (interpretation 목록)
         UnconsciousAnalyzeRequest request = new UnconsciousAnalyzeRequest(
                 recentDreams.stream()
                         .map(Dream::getInterpretation)
@@ -131,7 +137,21 @@ public class DreamAnalysisService {
         );
 
         String url = "http://" + FAST_API_URL + "/ai/dreams/unconscious";
-        return restTemplate.postForObject(url, request, UnconsciousAnalysisResponse.class);
+        UnconsciousAnalysisResponse apiResponse =
+                restTemplate.postForObject(url, request, UnconsciousAnalysisResponse.class);
+
+        // 최근 7개 꿈 (이모지 + 제목 조합)
+        List<String> recentDreamsFormatted = recentDreams.stream()
+                .map(dream -> dream.getEmoji() + " " + dream.getTitle())  // 📄 시험 문제를 놓친 꿈
+                .collect(Collectors.toList());
+
+        // 프론트용 DTO 재조립
+        return new UnconsciousAnalysisResponse(
+                apiResponse.getTitle(),
+                apiResponse.getAnalysis(),
+                apiResponse.getSuggestion(),
+                recentDreamsFormatted
+        );
     }
 
 }
