@@ -116,8 +116,13 @@ public class DreamAnalysisService {
     /**
      * 무의식 분석 호출 - 최근 7개 꿈
      */
-    public UnconsciousAnalysisResponse analyzeUnconscious(Long userId) {
-        List<Dream> recentDreams = dreamRepository.findTop7ByUserIdOrderByCreatedDateDesc(userId);
+    public UnconsciousAnalysisResponse analyzeUnconscious(String externalId) {
+        // externalId로 사용자 조회
+        User user = userRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND));
+
+        // 최근 7개 꿈 조회 (userId 사용)
+        List<Dream> recentDreams = dreamRepository.findTop7ByUserIdOrderByCreatedDateDesc(user.getId());
 
         // 최소 7개 검사
         if (recentDreams.size() < 7) {
