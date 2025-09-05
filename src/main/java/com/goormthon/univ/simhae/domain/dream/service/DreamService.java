@@ -22,25 +22,25 @@ public class DreamService {
 
     private final DreamRepository dreamRepository;
 
-    public List<DreamResponse> getDreamsByMonth(YearMonth ym, String keyword) {
+    public List<DreamResponse> getDreamsByMonth(Long userId, YearMonth ym, String keyword) {
         LocalDate start = ym.atDay(1);
         LocalDate end   = ym.plusMonths(1).atDay(1);
 
-        return dreamRepository.findByMonthAndKeyword(start, end, keyword)
+        return dreamRepository.findByUserAndMonthAndKeyword(userId, start, end, keyword)
                 .stream()
                 .map(this::toListDto)
                 .toList();
     }
 
-    public List<DreamResponse> getDreamsByDay(LocalDate date) {
-        return dreamRepository.findByDreamDate(date)
+    public List<DreamResponse> getDreamsByDay(Long userId, LocalDate date) {
+        return dreamRepository.findByUser_IdAndDreamDate(userId, date)
                 .stream()
                 .map(this::toListDto)
                 .toList();
     }
 
-    public Optional<DreamDetailResponse> getDreamDetail(Long dreamId) {
-        return dreamRepository.findById(dreamId)
+    public Optional<DreamDetailResponse> getDreamDetail(Long userId, Long dreamId) {
+        return dreamRepository.findByIdAndUser_Id(dreamId, userId)
                 .map(d -> new DreamDetailResponse(
                         d.getId(),
                         d.getDreamDate(),
@@ -48,7 +48,6 @@ public class DreamService {
                         d.getTitle(),
                         d.getEmoji(),
                         toKorean(d.getCategory()),
-                        d.getSummary(),
                         d.getInterpretation(),
                         d.getSuggestion()
                 ));
@@ -60,7 +59,6 @@ public class DreamService {
                 d.getDreamDate(),
                 d.getTitle(),
                 d.getEmoji(),
-                d.getSummary(),
                 d.getContent(),
                 toKorean(d.getCategory()),
                 d.getCreatedDate()
