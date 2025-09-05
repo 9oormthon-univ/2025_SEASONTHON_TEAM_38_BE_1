@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.goormthon.univ.simhae.domain.dream.entity.Dream;
+import com.goormthon.univ.simhae.domain.dream.entity.value.Category;
 import com.goormthon.univ.simhae.domain.dream.repository.DreamRepository;
 import com.goormthon.univ.simhae.domain.fastapi.dto.overall.DreamAnalyzeRequest;
 import com.goormthon.univ.simhae.domain.fastapi.dto.unconscious.UnconsciousAnalysisResponse;
@@ -67,10 +68,14 @@ public class DreamAnalysisService {
         String url = "http://" + FAST_API_URL + "/ai/dreams/overall";
         Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
 
-        // FastAPI 응답에서 바로 Map 가져오기
+        // FastAPI 응답에서 Map 가져오기
         Map<String, Object> restate = (Map<String, Object>) response.get("restate");
         Map<String, Object> unconscious = (Map<String, Object>) response.get("unconscious");
         Map<String, Object> suggestionMap = (Map<String, Object>) response.get("suggestion");
+
+        // category 문자열을 Enum으로 변환
+        String categoryStr = (String) restate.get("category");
+        Category categoryEnum = Category.valueOf(categoryStr);
 
         // Dream 엔티티 생성 및 저장
         Dream dream = Dream.builder()
@@ -78,14 +83,14 @@ public class DreamAnalysisService {
                 .title((String) restate.get("title"))
                 .emoji((String) restate.get("emoji"))
                 .content((String) restate.get("content"))
-                .summary((String) restate.getOrDefault("summary", restate.get("content")))
+                .category(categoryEnum)
                 .interpretation((String) unconscious.get("analysis"))
                 .suggestion((String) suggestionMap.get("suggestion"))
                 .dreamDate(LocalDate.now())
-                .category(null)
                 .build();
 
         dreamRepository.save(dream);
+
         return response;
     }
 
