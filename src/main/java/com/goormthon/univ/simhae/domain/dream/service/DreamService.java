@@ -47,7 +47,9 @@ public class DreamService {
                         d.getCreatedDate(),
                         d.getTitle(),
                         d.getEmoji(),
-                        toKorean(d.getCategory()),
+                        d.getContent(), // content 추가
+                        d.getCategory().getName(),          // categoryName
+                        d.getCategory().getDescription(),   // categoryDescription
                         d.getInterpretation(),
                         d.getSuggestion()
                 ));
