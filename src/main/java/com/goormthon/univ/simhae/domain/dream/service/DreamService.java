@@ -68,11 +68,17 @@ public class DreamService {
     private String toKorean(Category c) {
         if (c == null) return null;
         return switch (c) {
-            case ANXIETY -> "불안";
-            case JOY     -> "기쁨";
-            case SADNESS -> "슬픔";
-            case ANGER   -> "분노";
-            case OTHER   -> "기타";
+            case DAILY_REFLECTION -> "일상 반영 꿈";
+            case WISH_FULFILLMENT -> "소망 충족 꿈";
+            case NIGHTMARE        -> "악몽 / 불안 꿈";
+            case RECURRING       -> "반복 꿈";
+            case SYMBOLIC         -> "상징적 꿈";
+            case PRECOGNITIVE     -> "예지 / 직관 꿈";
+            case CREATIVE         -> "창의적 / 문제 해결 꿈";
+            case SOMATIC         -> "신체 반영 꿈";
+            case LUCID            -> "자각몽";
+            case SURREAL          -> "초현실 / 비논리적 꿈";
         };
     }
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.goormthon.univ.simhae.domain.dream.entity.Dream;
+import com.goormthon.univ.simhae.domain.dream.entity.value.Category;
 import com.goormthon.univ.simhae.domain.dream.repository.DreamRepository;
 import com.goormthon.univ.simhae.domain.fastapi.dto.overall.DreamAnalyzeRequest;
 import com.goormthon.univ.simhae.domain.fastapi.dto.unconscious.UnconsciousAnalysisResponse;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,7 +61,7 @@ public class DreamAnalysisService {
      */
     @Transactional
     public Map<String, Object> analyzeOverall(DreamAnalyzeRequest request, String externalId) {
-        // externalId로 User 조회
+        // User 조회
         User user = userRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND));
 
@@ -67,10 +69,13 @@ public class DreamAnalysisService {
         String url = "http://" + FAST_API_URL + "/ai/dreams/overall";
         Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
 
-        // FastAPI 응답에서 바로 Map 가져오기
         Map<String, Object> restate = (Map<String, Object>) response.get("restate");
         Map<String, Object> unconscious = (Map<String, Object>) response.get("unconscious");
         Map<String, Object> suggestionMap = (Map<String, Object>) response.get("suggestion");
+
+        // Category 문자열을 ENUM으로 변환
+        String categoryStr = (String) restate.get("category");
+        Category categoryEnum = Category.valueOf(categoryStr);
 
         // Dream 엔티티 생성 및 저장
         Dream dream = Dream.builder()
@@ -78,14 +83,34 @@ public class DreamAnalysisService {
                 .title((String) restate.get("title"))
                 .emoji((String) restate.get("emoji"))
                 .content((String) restate.get("content"))
+                .category(categoryEnum)
                 .interpretation((String) unconscious.get("analysis"))
                 .suggestion((String) suggestionMap.get("suggestion"))
                 .dreamDate(LocalDate.now())
-                .category(null)
                 .build();
 
         dreamRepository.save(dream);
-        return response;
+
+        // 클라이언트 응답용 Map 구성
+        Map<String, Object> clientResponse = new HashMap<>();
+        Map<String, Object> restateMap = new HashMap<>();
+        restateMap.put("emoji", dream.getEmoji());
+        restateMap.put("title", dream.getTitle());
+        restateMap.put("content", dream.getContent());
+        restateMap.put("categoryName", categoryEnum.getName());
+        restateMap.put("categoryDescription", categoryEnum.getDescription());
+
+        Map<String, Object> unconsciousMap = new HashMap<>();
+        unconsciousMap.put("analysis", dream.getInterpretation());
+
+        Map<String, Object> suggestionMapOut = new HashMap<>();
+        suggestionMapOut.put("suggestion", dream.getSuggestion());
+
+        clientResponse.put("restate", restateMap);
+        clientResponse.put("unconscious", unconsciousMap);
+        clientResponse.put("suggestion", suggestionMapOut);
+
+        return clientResponse;
     }
 
     /**
