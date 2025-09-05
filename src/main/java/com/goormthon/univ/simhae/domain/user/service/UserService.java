@@ -30,4 +30,8 @@ public class UserService {
                     return new UserRegisterResponse(saved.getId(), saved.getExternalId());
                 });
     }
+
+    public Long getUserIdOrNullByExternalId(String externalId) {
+        return userRepository.findByExternalId(externalId).map(User::getId).orElse(null);
+    }
 }
