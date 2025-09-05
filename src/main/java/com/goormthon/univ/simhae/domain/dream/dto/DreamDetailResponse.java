@@ -9,7 +9,9 @@ public record DreamDetailResponse(
         LocalDateTime createdAt,
         String title,
         String emoji,
-        String category,
+        String content,
+        String categoryName,
+        String categoryDescription,
         String interpretation,
         String suggestion
 ) {
