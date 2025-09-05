@@ -17,23 +17,26 @@ public interface DreamRepository extends JpaRepository<Dream, Long> {
     @Query("""
         SELECT d
         FROM Dream d
-        WHERE d.dreamDate >= :startDate
+        WHERE d.user.id = :userId
+          AND d.dreamDate >= :startDate
           AND d.dreamDate <  :endDate
           AND (
-              :keyword IS NULL OR :keyword = '' OR
-              LOWER(d.title)   LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-              LOWER(d.summary) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-              LOWER(d.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            :keyword IS NULL OR :keyword = '' OR
+            LOWER(d.title)   LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+            LOWER(d.content) LIKE LOWER(CONCAT('%', :keyword, '%'))
           )
         ORDER BY d.dreamDate DESC, d.id DESC
         """)
-    List<Dream> findByMonthAndKeyword(
+    List<Dream> findByUserAndMonthAndKeyword(
+            @Param("userId") Long userId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate")   LocalDate endDate,
             @Param("keyword")   String keyword
     );
 
     // 일별
-    List<Dream> findByDreamDate(LocalDate dreamDate);
+    List<Dream> findByUser_IdAndDreamDate(Long userId, LocalDate dreamDate);
+
+    Optional<Dream> findByIdAndUser_Id(Long id, Long userId);
 
 }
