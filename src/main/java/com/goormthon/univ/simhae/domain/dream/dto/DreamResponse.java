@@ -8,7 +8,6 @@ public record DreamResponse(
         LocalDate dreamDate,
         String title,
         String emoji,
-        String summary,
         String content,
         String category,
         LocalDateTime createdAt

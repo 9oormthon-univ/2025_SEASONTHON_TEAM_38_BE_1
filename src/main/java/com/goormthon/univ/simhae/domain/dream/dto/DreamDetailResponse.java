@@ -10,7 +10,6 @@ public record DreamDetailResponse(
         String title,
         String emoji,
         String category,
-        String summary,
         String interpretation,
         String suggestion
 ) {
