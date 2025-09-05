@@ -110,7 +110,6 @@ public class DreamAnalysisService {
         clientResponse.put("unconscious", unconsciousMap);
         clientResponse.put("suggestion", suggestionMapOut);
 
-        // 이렇게 바로 반환
         return clientResponse;
     }
 
