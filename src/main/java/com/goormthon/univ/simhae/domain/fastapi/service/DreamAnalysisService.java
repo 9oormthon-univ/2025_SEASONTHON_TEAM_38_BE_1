@@ -78,7 +78,6 @@ public class DreamAnalysisService {
                 .title((String) restate.get("title"))
                 .emoji((String) restate.get("emoji"))
                 .content((String) restate.get("content"))
-                .summary((String) restate.getOrDefault("summary", restate.get("content")))
                 .interpretation((String) unconscious.get("analysis"))
                 .suggestion((String) suggestionMap.get("suggestion"))
                 .dreamDate(LocalDate.now())
