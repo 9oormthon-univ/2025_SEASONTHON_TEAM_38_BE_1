@@ -12,5 +12,7 @@ public class RephraseResponse {
     private String emoji;    // 꿈을 상징하는 이모지
     private String title;    // 꿈 제목
     private String content;  // 꿈 내용
+    private String categoryName;         // 꿈 카테고리
+    private String categoryDescription;  // 정의
 
 }
