@@ -123,7 +123,8 @@ public class DreamAnalysisService {
         if (recentDreams.size() < 7) {
             throw new BadRequestException(ErrorMessage.UNCONSCIOUS_MIN_DREAMS);
         }
-        //
+
+        // FastAPI 요청용 DTO (interpretation 목록)
         UnconsciousAnalyzeRequest request = new UnconsciousAnalyzeRequest(
                 recentDreams.stream()
                         .map(Dream::getInterpretation)
@@ -131,7 +132,21 @@ public class DreamAnalysisService {
         );
 
         String url = "http://" + FAST_API_URL + "/ai/dreams/unconscious";
-        return restTemplate.postForObject(url, request, UnconsciousAnalysisResponse.class);
+        UnconsciousAnalysisResponse apiResponse =
+                restTemplate.postForObject(url, request, UnconsciousAnalysisResponse.class);
+
+        // 최근 7개 꿈 (이모지 + 제목 조합)
+        List<String> recentDreamsFormatted = recentDreams.stream()
+                .map(dream -> dream.getEmoji() + " " + dream.getTitle())  // 📄 시험 문제를 놓친 꿈
+                .collect(Collectors.toList());
+
+        // 프론트용 DTO 재조립
+        return new UnconsciousAnalysisResponse(
+                apiResponse.getTitle(),
+                apiResponse.getAnalysis(),
+                apiResponse.getSuggestion(),
+                recentDreamsFormatted
+        );
     }
 
 }
