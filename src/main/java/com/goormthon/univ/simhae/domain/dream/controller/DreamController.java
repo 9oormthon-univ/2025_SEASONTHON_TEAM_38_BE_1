@@ -128,5 +128,33 @@ public class DreamController {
                 .orElseGet(() ->
                         ResponseEntity.status(404).body(ErrorResponse.of(ErrorMessage.RESOURCE_NOT_FOUND)));
     }
+
+    @DeleteMapping("/{dreamId}")
+    public ResponseEntity<?> deleteDream(
+            @RequestHeader(name = HEADER_ANON, required = false) String externalId,
+            @PathVariable Long dreamId
+    ){
+        // 헤더 검증
+        if (externalId == null || externalId.isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(ErrorResponse.of(ErrorMessage.REQUIRED_FIELD_MISSING));
+        }
+        // 사용자 확인
+        Long userId = userService.getUserIdOrNullByExternalId(externalId.trim());
+        if (userId == null) {
+            return ResponseEntity.status(404)
+                    .body(ErrorResponse.of(ErrorMessage.RESOURCE_NOT_FOUND));
+        }
+
+        // 소유자 일치하는 꿈 삭제
+        boolean deleted = dreamService.deleteDream(userId, dreamId);
+        if (!deleted) {
+            return ResponseEntity.status(404)
+                    .body(ErrorResponse.of(ErrorMessage.RESOURCE_NOT_FOUND));
+        }
+
+        // 204 No Content (바디 없음)
+        return ResponseEntity.ok(SuccessResponse.of(SuccessMessage.DELETED_SUCCESS));
+    }
 }
 
