@@ -55,6 +55,11 @@ public class DreamService {
                 ));
     }
 
+    @Transactional
+    public boolean deleteDream(Long userId, Long dreamId) {
+        return dreamRepository.deleteByIdAndUser_Id(dreamId, userId) > 0;
+    }
+
     private DreamResponse toListDto(Dream d) {
         return new DreamResponse(
                 d.getId(),
@@ -82,5 +87,7 @@ public class DreamService {
             case SURREAL          -> "초현실 / 비논리적 꿈";
         };
     }
+
+
 
 }
