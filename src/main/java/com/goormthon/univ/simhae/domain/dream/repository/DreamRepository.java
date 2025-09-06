@@ -39,4 +39,5 @@ public interface DreamRepository extends JpaRepository<Dream, Long> {
 
     Optional<Dream> findByIdAndUser_Id(Long id, Long userId);
 
+    long deleteByIdAndUser_Id(Long id, Long userId);
 }
