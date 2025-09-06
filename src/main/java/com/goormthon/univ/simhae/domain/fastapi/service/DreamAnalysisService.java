@@ -86,7 +86,7 @@ public class DreamAnalysisService {
                 .category(categoryEnum)
                 .interpretation((String) unconscious.get("analysis"))
                 .suggestion((String) suggestionMap.get("suggestion"))
-                .dreamDate(LocalDate.now())
+                .dreamDate(request.getDreamDate())
                 .build();
 
         dreamRepository.save(dream);
