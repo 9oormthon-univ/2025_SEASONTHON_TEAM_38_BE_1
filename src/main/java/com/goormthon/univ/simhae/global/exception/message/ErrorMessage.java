@@ -11,6 +11,10 @@ public enum ErrorMessage {
     REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST.value(), "필수 입력값이 누락되었습니다"),
     INPUT_VALUE_TOO_SHORT(HttpStatus.BAD_REQUEST.value(), "입력값이 최소 길이보다 짧습니다"),
     INPUT_VALUE_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "입력값이 최대 길이를 초과했습니다"),
+    INVALID_MONTH_FORMAT(HttpStatus.BAD_REQUEST.value(), "dreamDate는 yyyy-MM 형식이어야 합니다. 예) 2025-08"),
+    INVALID_DAY_FORMAT(HttpStatus.BAD_REQUEST.value(), "dreamDate는 yyyy-MM-dd 형식이어야 합니다. 예) 2025-08-22"),
+
+
 
     // 404 Not Found
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 유저를 찾을 수 없습니다"),
