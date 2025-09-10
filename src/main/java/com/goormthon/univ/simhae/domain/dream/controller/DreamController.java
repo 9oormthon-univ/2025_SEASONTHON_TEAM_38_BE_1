@@ -65,7 +65,7 @@ public class DreamController {
                 ym = YearMonth.parse(month); // yyyy-MM
             } catch (DateTimeParseException e) {
                 return ResponseEntity.badRequest()
-                        .body(ErrorResponse.of(400, "dreamDate는 yyyy-MM 형식이어야 합니다. 예) 2025-08"));
+                        .body(ErrorResponse.of(ErrorMessage.INVALID_MONTH_FORMAT));
             }
         }
 
@@ -96,7 +96,7 @@ public class DreamController {
         try { day = LocalDate.parse(date); }
         catch (DateTimeParseException e) {
             return ResponseEntity.badRequest()
-                    .body(ErrorResponse.of(400, "dreamDate는 yyyy-MM-dd 형식이어야 합니다. 예) 2025-08-22"));
+                    .body(ErrorResponse.of(ErrorMessage.INVALID_DAY_FORMAT));
         }
 
         List<DreamResponse> data = dreamService.getDreamsByDay(userId, day);
