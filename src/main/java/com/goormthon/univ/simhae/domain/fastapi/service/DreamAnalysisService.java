@@ -22,9 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +38,7 @@ public class DreamAnalysisService {
     private final RestTemplate restTemplate;
     private final UserRepository userRepository;
 
-    @Value("${deploy.fastapi.url}")
+    @Value("${deploy.fastapi_url}")
     private String FAST_API_URL;
 
     public DreamAnalysisService(DreamRepository dreamRepository, UserRepository userRepository) {
@@ -91,8 +94,8 @@ public class DreamAnalysisService {
 
         dreamRepository.save(dream);
 
-        // 클라이언트 응답용 Map 구성
         Map<String, Object> clientResponse = new HashMap<>();
+
         Map<String, Object> restateMap = new HashMap<>();
         restateMap.put("emoji", dream.getEmoji());
         restateMap.put("title", dream.getTitle());
@@ -100,8 +103,21 @@ public class DreamAnalysisService {
         restateMap.put("categoryName", categoryEnum.getName());
         restateMap.put("categoryDescription", categoryEnum.getDescription());
 
+        String interpretation = dream.getInterpretation();
+        List<Map<String, String>> analysisList = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile("\\[(.+?)\\]\\s*(.*?)(?=(\\[.+?\\]|$))", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(interpretation);
+
+        while (matcher.find()) {
+            Map<String, String> item = new HashMap<>();
+            item.put("title", matcher.group(1).trim());
+            item.put("content", matcher.group(2).trim());
+            analysisList.add(item);
+        }
+
         Map<String, Object> unconsciousMap = new HashMap<>();
-        unconsciousMap.put("analysis", dream.getInterpretation());
+        unconsciousMap.put("analysis", analysisList);
 
         Map<String, Object> suggestionMapOut = new HashMap<>();
         suggestionMapOut.put("suggestion", dream.getSuggestion());
@@ -116,42 +132,47 @@ public class DreamAnalysisService {
     /**
      * 무의식 분석 호출 - 최근 7개 꿈
      */
-    public UnconsciousAnalysisResponse analyzeUnconscious(String externalId) {
-        // externalId로 사용자 조회
+    public Map<String, Object> analyzeUnconscious(String externalId) {
         User user = userRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND));
 
-        // 최근 7개 꿈 조회 (userId 사용)
         List<Dream> recentDreams = dreamRepository.findTop7ByUserIdOrderByCreatedDateDesc(user.getId());
-
-        // 최소 7개 검사
         if (recentDreams.size() < 7) {
             throw new BadRequestException(ErrorMessage.UNCONSCIOUS_MIN_DREAMS);
         }
 
-        // FastAPI 요청용 DTO (interpretation 목록)
         UnconsciousAnalyzeRequest request = new UnconsciousAnalyzeRequest(
                 recentDreams.stream()
                         .map(Dream::getInterpretation)
                         .collect(Collectors.toList())
         );
 
-        String url = "http://" + FAST_API_URL + "/ai/dreams/unconscious";
         UnconsciousAnalysisResponse apiResponse =
-                restTemplate.postForObject(url, request, UnconsciousAnalysisResponse.class);
+                restTemplate.postForObject("http://" + FAST_API_URL + "/ai/dreams/unconscious",
+                        request, UnconsciousAnalysisResponse.class);
 
-        // 최근 7개 꿈 (이모지 + 제목 조합)
         List<String> recentDreamsFormatted = recentDreams.stream()
-                .map(dream -> dream.getEmoji() + " " + dream.getTitle())  // 📄 시험 문제를 놓친 꿈
+                .map(dream -> dream.getEmoji() + " " + dream.getTitle())
                 .collect(Collectors.toList());
 
-        // 프론트용 DTO 재조립
-        return new UnconsciousAnalysisResponse(
-                apiResponse.getTitle(),
-                apiResponse.getAnalysis(),
-                apiResponse.getSuggestion(),
-                recentDreamsFormatted
-        );
+        String analysisRaw = apiResponse.getAnalysis();
+        List<Map<String, String>> analysisList = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\[(.+?)\\]\\s*(.*?)(?=(\\[.+?\\]|$))", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(analysisRaw);
+        while (matcher.find()) {
+            Map<String, String> item = new HashMap<>();
+            item.put("title", matcher.group(1).trim());
+            item.put("content", matcher.group(2).trim());
+            analysisList.add(item);
+        }
+
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("title", apiResponse.getTitle());
+        dataMap.put("analysis", analysisList);
+        dataMap.put("suggestion", apiResponse.getSuggestion());
+        dataMap.put("recentDreams", recentDreamsFormatted);
+
+        return dataMap;
     }
 
 }

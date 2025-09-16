@@ -36,7 +36,7 @@ public class DreamAnalysisController {
     public ResponseEntity<SuccessResponse<UnconsciousAnalysisResponse>> analyzeUnconscious(
             @RequestHeader("X-Anonymous-Id") String externalId) {
 
-        UnconsciousAnalysisResponse result = dreamAnalysisService.analyzeUnconscious(externalId);
+        Map<String, Object> result = dreamAnalysisService.analyzeUnconscious(externalId);
         return ResponseEntity.status(201)
                 .body(SuccessResponse.of(SuccessMessage.UNCONSCIOUS_SUCCESS, result));
     }
