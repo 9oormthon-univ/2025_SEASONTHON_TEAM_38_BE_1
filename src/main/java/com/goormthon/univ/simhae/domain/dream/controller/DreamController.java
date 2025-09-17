@@ -2,13 +2,14 @@ package com.goormthon.univ.simhae.domain.dream.controller;
 
 import com.goormthon.univ.simhae.domain.dream.dto.DreamResponse;
 import com.goormthon.univ.simhae.domain.dream.service.DreamService;
-import com.goormthon.univ.simhae.domain.user.service.UserService;
 import com.goormthon.univ.simhae.global.dto.ErrorResponse;
 import com.goormthon.univ.simhae.global.dto.SuccessResponse;
 import com.goormthon.univ.simhae.global.exception.message.ErrorMessage;
 import com.goormthon.univ.simhae.global.exception.message.SuccessMessage;
+import com.goormthon.univ.simhae.global.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -21,10 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DreamController {
 
-    private static final String HEADER_ANON = "X-Anonymous-Id";
     private final DreamService dreamService;
-    private final UserService userService;
-
     /**
      * 월별 조회 + 검색 통합
      * GET /dreams?dreamDate=yyyy-MM&keyword=...  (모두 옵션)
@@ -33,15 +31,15 @@ public class DreamController {
      */
     @GetMapping
     public ResponseEntity<?> getDreamsByMonth(
-            @RequestHeader(name = HEADER_ANON, required = false) String externalId,
+            @AuthenticationPrincipal JwtAuthFilter.UserPrincipal principal,
             @RequestParam(value = "dreamDate", required = false) String month, // yyyy-MM
             @RequestParam(value = "keyword",   required = false) String keyword
     ) {
-        if (externalId == null || externalId.isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(ErrorResponse.of(ErrorMessage.REQUIRED_FIELD_MISSING)); // 헤더 누락
+        if (principal == null) {
+            return ResponseEntity.status(401)
+                    .body(ErrorResponse.of(ErrorMessage.UNAUTHORIZED));
         }
-        Long userId = userService.getUserIdOrNullByExternalId(externalId);
+        Long userId = principal.id();
         if (userId == null) {
             return ResponseEntity.status(404)
                     .body(ErrorResponse.of(ErrorMessage.USER_NOT_FOUND)); // 미등록 사용자
@@ -79,18 +77,18 @@ public class DreamController {
      */
     @GetMapping("/day")
     public ResponseEntity<?> getDreamsByDay(
-            @RequestHeader(name = HEADER_ANON, required = false) String externalId,
+            @AuthenticationPrincipal JwtAuthFilter.UserPrincipal principal,
             @RequestParam("dreamDate") String date
     ) {
-        if (externalId == null || externalId.isBlank() || date == null || date.isBlank()) {
+        if (principal == null) {
+            return ResponseEntity.status(401)
+                    .body(ErrorResponse.of(ErrorMessage.UNAUTHORIZED));
+        }
+        if (date == null || date.isBlank()) {
             return ResponseEntity.badRequest()
                     .body(ErrorResponse.of(ErrorMessage.REQUIRED_FIELD_MISSING));
         }
-        Long userId = userService.getUserIdOrNullByExternalId(externalId);
-        if (userId == null) {
-            return ResponseEntity.status(404)
-                    .body(ErrorResponse.of(ErrorMessage.RESOURCE_NOT_FOUND));
-        }
+        Long userId = principal.id();
 
         final LocalDate day;
         try { day = LocalDate.parse(date); }
@@ -109,18 +107,14 @@ public class DreamController {
      */
     @GetMapping("/{dreamId}")
     public ResponseEntity<?> getDreamDetail(
-            @RequestHeader(name = HEADER_ANON, required = false) String externalId,
+            @AuthenticationPrincipal JwtAuthFilter.UserPrincipal principal,
             @PathVariable Long dreamId
     ) {
-        if (externalId == null || externalId.isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(ErrorResponse.of(ErrorMessage.REQUIRED_FIELD_MISSING));
+        if (principal == null) {
+            return ResponseEntity.status(401)
+                    .body(ErrorResponse.of(ErrorMessage.UNAUTHORIZED));
         }
-        Long userId = userService.getUserIdOrNullByExternalId(externalId);
-        if (userId == null) {
-            return ResponseEntity.status(404)
-                    .body(ErrorResponse.of(ErrorMessage.RESOURCE_NOT_FOUND));
-        }
+        Long userId = principal.id();
 
         return dreamService.getDreamDetail(userId, dreamId)
                 .<ResponseEntity<?>>map(detail ->
@@ -131,20 +125,15 @@ public class DreamController {
 
     @DeleteMapping("/{dreamId}")
     public ResponseEntity<?> deleteDream(
-            @RequestHeader(name = HEADER_ANON, required = false) String externalId,
+            @AuthenticationPrincipal JwtAuthFilter.UserPrincipal principal,
             @PathVariable Long dreamId
     ){
-        // 헤더 검증
-        if (externalId == null || externalId.isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(ErrorResponse.of(ErrorMessage.REQUIRED_FIELD_MISSING));
+        if (principal == null) {
+            return ResponseEntity.status(401)
+                    .body(ErrorResponse.of(ErrorMessage.UNAUTHORIZED));
         }
-        // 사용자 확인
-        Long userId = userService.getUserIdOrNullByExternalId(externalId.trim());
-        if (userId == null) {
-            return ResponseEntity.status(404)
-                    .body(ErrorResponse.of(ErrorMessage.RESOURCE_NOT_FOUND));
-        }
+        Long userId = principal.id();
+
 
         // 소유자 일치하는 꿈 삭제
         boolean deleted = dreamService.deleteDream(userId, dreamId);
