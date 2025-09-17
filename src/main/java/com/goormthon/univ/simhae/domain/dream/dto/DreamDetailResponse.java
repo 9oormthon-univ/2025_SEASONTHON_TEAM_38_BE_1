@@ -2,6 +2,8 @@ package com.goormthon.univ.simhae.domain.dream.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 public record DreamDetailResponse(
         Long dreamId,
@@ -12,7 +14,7 @@ public record DreamDetailResponse(
         String content,
         String categoryName,
         String categoryDescription,
-        String interpretation,
+        List<Map<String, String>> interpretation,
         String suggestion
 ) {
 }
