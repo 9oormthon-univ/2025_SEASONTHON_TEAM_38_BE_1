@@ -1,13 +1,12 @@
 name: SIMHAE CI/CD
 
 on:
-  push:
+  pull_request:
     branches:
-      - ci/#37
+      - develop
 
 jobs:
   build-and-push:
-    if: github.repository == 'bum0w0/2025_SEASONTHON_TEAM_38_BE_1' || github.repository == 'YUSEONU/2025_SEASONTHON_TEAM_38_BE_1'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
