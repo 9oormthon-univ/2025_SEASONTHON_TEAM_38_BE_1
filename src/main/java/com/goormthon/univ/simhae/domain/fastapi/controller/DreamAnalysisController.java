@@ -36,7 +36,6 @@ public class DreamAnalysisController {
     }
 
     // 무의식 분석 - 최근 7개 꿈
-// 무의식 분석 - 최근 7개 꿈
     @PostMapping("/unconscious")
     public ResponseEntity<SuccessResponse<UnconsciousAnalysisResponse>> analyzeUnconscious(
             @AuthenticationPrincipal JwtAuthFilter.UserPrincipal principal
@@ -44,7 +43,7 @@ public class DreamAnalysisController {
 
         Long userId = principal.id();
 
-        UnconsciousAnalysisResponse result = dreamAnalysisService.analyzeUnconscious(userId);
+        Map<String, Object> result = dreamAnalysisService.analyzeUnconscious(userId);
         return ResponseEntity.status(201)
                 .body(SuccessResponse.of(SuccessMessage.UNCONSCIOUS_SUCCESS, result));
     }

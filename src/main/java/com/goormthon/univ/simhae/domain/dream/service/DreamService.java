@@ -12,8 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -41,18 +42,31 @@ public class DreamService {
 
     public Optional<DreamDetailResponse> getDreamDetail(Long userId, Long dreamId) {
         return dreamRepository.findByIdAndUser_Id(dreamId, userId)
-                .map(d -> new DreamDetailResponse(
-                        d.getId(),
-                        d.getDreamDate(),
-                        d.getCreatedDate(),
-                        d.getTitle(),
-                        d.getEmoji(),
-                        d.getContent(), // content 추가
-                        d.getCategory().getName(),          // categoryName
-                        d.getCategory().getDescription(),   // categoryDescription
-                        d.getInterpretation(),
-                        d.getSuggestion()
-                ));
+                .map(d -> {
+                    List<Map<String, String>> analysisList = new ArrayList<>();
+                    Pattern pattern = Pattern.compile("\\[(.+?)\\]\\s*(.*?)(?=(\\[.+?\\]|$))", Pattern.DOTALL);
+                    Matcher matcher = pattern.matcher(d.getInterpretation());
+
+                    while (matcher.find()) {
+                        Map<String, String> item = new HashMap<>();
+                        item.put("title", matcher.group(1).trim());
+                        item.put("content", matcher.group(2).trim());
+                        analysisList.add(item);
+                    }
+
+                    return new DreamDetailResponse(
+                            d.getId(),
+                            d.getDreamDate(),
+                            d.getCreatedDate(),
+                            d.getTitle(),
+                            d.getEmoji(),
+                            d.getContent(),
+                            d.getCategory().getName(),
+                            d.getCategory().getDescription(),
+                            analysisList,
+                            d.getSuggestion()
+                    );
+                });
     }
 
     @Transactional
