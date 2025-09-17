@@ -1,13 +1,9 @@
 name: SIMHAE Build & Test
 
 on:
-  push:
+  pull_request:
     branches:
-      - 'feat/#*'   # 기능 개발 브랜치
-      - 'fix/#*'    # 버그 수정 브랜치
-      - 'ci/#*'     # CI 관련 브랜치
-      - 'hotfix/#*' # 긴급 수정 브랜치
-      - 'test/#*'   # 테스트 브랜치
+      - develop
 
 jobs:
   build-test:
