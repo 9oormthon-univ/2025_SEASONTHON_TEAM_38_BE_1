@@ -63,9 +63,9 @@ public class DreamAnalysisService {
      * 전체 분석 호출 및 DB 저장
      */
     @Transactional
-    public Map<String, Object> analyzeOverall(DreamAnalyzeRequest request, String externalId) {
+    public Map<String, Object> analyzeOverall(DreamAnalyzeRequest request, Long userId) {
         // User 조회
-        User user = userRepository.findByExternalId(externalId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND));
 
         // FastAPI 호출
@@ -132,8 +132,8 @@ public class DreamAnalysisService {
     /**
      * 무의식 분석 호출 - 최근 7개 꿈
      */
-    public Map<String, Object> analyzeUnconscious(String externalId) {
-        User user = userRepository.findByExternalId(externalId)
+    public Map<String, Object> analyzeUnconscious(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND));
 
         List<Dream> recentDreams = dreamRepository.findTop7ByUserIdOrderByCreatedDateDesc(user.getId());

@@ -14,6 +14,10 @@ public enum ErrorMessage {
     INVALID_MONTH_FORMAT(HttpStatus.BAD_REQUEST.value(), "dreamDate는 yyyy-MM 형식이어야 합니다. 예) 2025-08"),
     INVALID_DAY_FORMAT(HttpStatus.BAD_REQUEST.value(), "dreamDate는 yyyy-MM-dd 형식이어야 합니다. 예) 2025-08-22"),
 
+    // 401 Unauthorized
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED.value(), "인증이 필요합니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 토큰입니다."),
+
 
 
     // 404 Not Found
