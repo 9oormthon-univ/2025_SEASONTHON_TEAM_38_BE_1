@@ -35,7 +35,16 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push Docker image to ECR
+      - name: Build and push Spring Boot Docker image
         run: |
-          docker buildx build --platform linux/amd64 -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest .
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
+          docker buildx build --platform linux/amd64 \
+            -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.SPRING_IMAGE_NAME }}:latest \
+            -f Dockerfile .
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.SPRING_IMAGE_NAME }}:latest
+
+      - name: Build and push Nginx Docker image
+        run: |
+          docker buildx build --platform linux/amd64 \
+            -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.NGINX_IMAGE_NAME }}:latest \
+            -f nginx/Dockerfile ./nginx
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.NGINX_IMAGE_NAME }}:latest
