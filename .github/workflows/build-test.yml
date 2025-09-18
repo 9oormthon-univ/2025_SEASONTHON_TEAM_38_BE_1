@@ -21,9 +21,13 @@ jobs:
       - name: Cache Gradle
         uses: gradle/gradle-build-action@v3
 
-      - name: Build & Test
+      - name: Build & Test (Gradle)
         run: ./gradlew clean build -x test
 
-      - name: Dockerfile Lint & Build Check
+      - name: Dockerfile Lint & Build Check (Spring Boot)
         run: |
-          docker build --no-cache --pull -t simhae-test-image -f Dockerfile .
+          docker build --no-cache --pull -t simhae-springboot-test -f Dockerfile .
+
+      - name: Dockerfile Lint & Build Check (Nginx)
+        run: |
+          docker build --no-cache --pull -t simhae-nginx-test -f nginx/Dockerfile ./nginx
