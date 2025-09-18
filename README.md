@@ -1,3 +1,9 @@
+# SimHae (심해 心解)
+
+### **"심해 心解 – 꿈으로 무의식을 의식화하다"**
+
+> 꿈 기록을 바탕으로 무의식 속 감정을 해석하고 심리적 통찰을 제공
+
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7104fd3a-152d-4da9-9731-822a7e84f25b" />
 
 
